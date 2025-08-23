@@ -70,7 +70,7 @@ public class GunShooting : MonoBehaviour
     {
         if (Input.GetButtonDown("Reload") && AKMagazines > 0)
         {
-            
+            Debug.Log("Reloading");
             AKMagSize = 30;
             //Sets the magazine to one less everytime you reload
             AKMagazines -= 1;
