@@ -10,7 +10,7 @@ public class GunShooting : MonoBehaviour
     public int AKMagSize = 30;
     public int AKMagazines = 3;
     public float NextTimeToFire = 0f;
-
+    Ray ray;
     public Camera cam;
     public ParticleSystem Muzzle;
     public GameObject ImpactVFX;
@@ -53,8 +53,15 @@ public class GunShooting : MonoBehaviour
                     hit.rigidbody.AddForce(-hit.normal * impactforce);
 
                 }
+
+                var hitBox = hit.collider.GetComponent<Hitbox>();
+                if (hitBox)
+                {
+                    hitBox.OnRaycastHit(this, ray.direction);
+                }
+
                 //Adds a particle effect at the end of a ray, and instantiate it as a GO. 
-                GameObject ImpactGO = Instantiate(ImpactVFX, hit.point, Quaternion.LookRotation(hit.normal));
+                    GameObject ImpactGO = Instantiate(ImpactVFX, hit.point, Quaternion.LookRotation(hit.normal));
                 Destroy(ImpactGO, 2f);
                 AKMagSize -= 1;
                 Debug.Log(AKMagSize);
