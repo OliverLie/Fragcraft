@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 
 public class GunShooting : MonoBehaviour
@@ -10,23 +9,19 @@ public class GunShooting : MonoBehaviour
     public int AKMagSize = 30;
     public int AKMagazines = 3;
     public float NextTimeToFire = 0f;
-    Ray ray;
+
     public Camera cam;
     public ParticleSystem Muzzle;
     public GameObject ImpactVFX;
 
-
     void Update()
     {
-
         if (Input.GetButton("Fire1") && Time.time >= NextTimeToFire)
         {
             NextTimeToFire = Time.time + 1f / fireRate;
             Shoot();
-
         }
         AKReload();
-
     }
 
     void Shoot()
@@ -35,54 +30,41 @@ public class GunShooting : MonoBehaviour
         {
             Muzzle.Play();
             RaycastHit hit;
+
             if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, range))
             {
-
-                Enemy enemy = hit.transform.GetComponent<Enemy>();
-
                 Debug.Log(hit.transform.name);
-                
-                if (enemy != null)
-                {
-                    enemy.TakeDamage(damage);
 
-                }
-                //Pushed Objects with a Rigidbody
-                if (hit.rigidbody != null)
-                {
-                    hit.rigidbody.AddForce(-hit.normal * impactforce);
-
-                }
-
+                // Hitbox damage
                 var hitBox = hit.collider.GetComponent<Hitbox>();
                 if (hitBox)
                 {
-                    hitBox.OnRaycastHit(this, ray.direction);
+                    hitBox.OnRaycastHit(this, cam.transform.forward); // ✅ direction sat korrekt
                 }
 
-                //Adds a particle effect at the end of a ray, and instantiate it as a GO. 
-                    GameObject ImpactGO = Instantiate(ImpactVFX, hit.point, Quaternion.LookRotation(hit.normal));
+                // Skub objekter med Rigidbody
+                if (hit.rigidbody != null)
+                {
+                    hit.rigidbody.AddForce(-hit.normal * impactforce);
+                }
+
+                // Impact effekt
+                GameObject ImpactGO = Instantiate(ImpactVFX, hit.point, Quaternion.LookRotation(hit.normal));
                 Destroy(ImpactGO, 2f);
+
                 AKMagSize -= 1;
-                Debug.Log(AKMagSize);
-
-
+                Debug.Log("Ammo left: " + AKMagSize);
             }
         }
-
     }
-    
 
-    void AKReload() //Add a Reload animation in the future
+    void AKReload()
     {
         if (Input.GetButtonDown("Reload") && AKMagazines > 0)
         {
             Debug.Log("Reloading");
             AKMagSize = 30;
-            //Sets the magazine to one less everytime you reload
             AKMagazines -= 1;
-
         }
-
     }
 }

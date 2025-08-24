@@ -1,29 +1,30 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    public float maxHealth;
-    [HideInInspector]
-    public float currentHealth;
+    public float maxHealth = 100f;
+    [HideInInspector] public float currentHealth;
 
     SkinnedMeshRenderer[] skinnedMeshRenderers;
-    UiHealthbar Healthbar;
-    public float blinkIntensity;
-    public float blinkDuration;
-    public float blinkTimer;
-    public float dieForce;
+    UiHealthbar healthbar;
+    public float blinkIntensity = 5f;
+    public float blinkDuration = 0.2f;
+    float blinkTimer;
 
     Ragdoll ragdoll;
+    PotentialAIScript ai;
 
     void Start()
     {
-        // Hent ALLE skinned mesh renderers på spilleren
+        // Mesh og UI
         skinnedMeshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
-        Healthbar = GetComponentInChildren<UiHealthbar>();
+        healthbar = GetComponentInChildren<UiHealthbar>();
         ragdoll = GetComponent<Ragdoll>();
+        ai = GetComponent<PotentialAIScript>();
+
         currentHealth = maxHealth;
 
+        // Tilføj hitboxes til alle rigidbodies
         var rigidBodies = GetComponentsInChildren<Rigidbody>();
         foreach (var rigidBody in rigidBodies)
         {
@@ -35,31 +36,42 @@ public class Health : MonoBehaviour
     public void TakeDamage(float amount, Vector3 direction)
     {
         currentHealth -= amount;
-        Healthbar.SetHealthBarPercentage(currentHealth / maxHealth);
-        if (currentHealth <= 0.0f)
+        if (healthbar != null)
+            healthbar.SetHealthBarPercentage(currentHealth / maxHealth);
+
+        if (currentHealth <= 0f)
         {
             Die(direction);
+
         }
 
         blinkTimer = blinkDuration;
     }
 
-    public void Die(Vector3 direction)
+    void Die(Vector3 direction)
     {
-        ragdoll.ActiveRagdoll();
-        direction.y = 1;
-        ragdoll.ApplyForce(direction * dieForce);
-        Healthbar.gameObject.SetActive(false);
+        if (ragdoll != null)
+        {
+            ragdoll.ActiveRagdoll();
+            ragdoll.ApplyForce(direction * 5f); // Spark i dødsretningen
+        }
 
+        if (ai != null)
+            ai.enabled = false; // Sluk AI’en
+
+        transform.Find("Canvas").gameObject.SetActive(false);
+
+
+      
     }
 
     void Update()
     {
+        // Blink-effekt
         blinkTimer -= Time.deltaTime;
         float lerp = Mathf.Clamp01(blinkTimer / blinkDuration);
         float intensity = lerp * blinkIntensity;
 
-        // Loop gennem ALLE meshes
         foreach (var renderer in skinnedMeshRenderers)
         {
             foreach (var mat in renderer.materials)
