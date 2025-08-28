@@ -1,4 +1,7 @@
 using UnityEngine;
+using TMPro;
+
+
 
 public class GunShooting : MonoBehaviour
 {
@@ -13,6 +16,15 @@ public class GunShooting : MonoBehaviour
     public Camera cam;
     public ParticleSystem Muzzle;
     public GameObject ImpactVFX;
+    public TextMeshProUGUI AmmoUI;
+    public TextMeshProUGUI MagazineUI;
+
+    void Ready()
+    {
+        AmmoUI = GetComponent<TextMeshProUGUI>();
+        MagazineUI = GetComponent<TextMeshProUGUI>();
+    }
+
 
     void Update()
     {
@@ -22,6 +34,8 @@ public class GunShooting : MonoBehaviour
             Shoot();
         }
         AKReload();
+        MagazineUI.SetText("Mags: {0} / 3", AKMagazines);
+        AmmoUI.SetText("{0} / 30", AKMagSize);
     }
 
     void Shoot()
@@ -60,8 +74,9 @@ public class GunShooting : MonoBehaviour
 
     void AKReload()
     {
-        if (Input.GetButtonDown("Reload") && AKMagazines > 0)
+        if (Input.GetButtonDown("Reload") && AKMagazines > 0 && AKMagSize != 30)
         {
+            
             Debug.Log("Reloading");
             AKMagSize = 30;
             AKMagazines -= 1;

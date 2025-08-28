@@ -8,6 +8,7 @@ public class PotentialAIScript : MonoBehaviour
     public Transform player;
     public LayerMask whatIsGround, whatIsPlayer;
     public Transform weaponHandPosition;
+    public Health EnemyAI;
 
     Animator anim;
 
@@ -33,6 +34,7 @@ public class PotentialAIScript : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         health = GetComponent<Health>();
         anim = GetComponent<Animator>();
+        
     }
 
     private void Update()
@@ -52,6 +54,7 @@ public class PotentialAIScript : MonoBehaviour
         if (!playerInSightRange && !playerInAttackRange) Patroling();
         if (playerInSightRange && !playerInAttackRange) ChasePlayer();
         if (playerInSightRange && playerInAttackRange) Attacking();
+        if (EnemyAI.currentHealth != 100) ChasePlayer();
     }
 
     private void Patroling()

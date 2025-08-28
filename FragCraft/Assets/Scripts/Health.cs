@@ -3,6 +3,7 @@ using UnityEngine;
 public class Health : MonoBehaviour
 {
     public float maxHealth = 100f;
+    public PotentialAIScript AIScript;
     [HideInInspector] public float currentHealth;
 
     SkinnedMeshRenderer[] skinnedMeshRenderers;
@@ -10,12 +11,15 @@ public class Health : MonoBehaviour
     public float blinkIntensity = 5f;
     public float blinkDuration = 0.2f;
     float blinkTimer;
+    public ExperienceManager experience;
 
     Ragdoll ragdoll;
     PotentialAIScript ai;
+    public bool EnemyAIDead = false;
 
     void Start()
     {
+        
         // Mesh og UI
         skinnedMeshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
         healthbar = GetComponentInChildren<UiHealthbar>();
@@ -42,7 +46,7 @@ public class Health : MonoBehaviour
         if (currentHealth <= 0f)
         {
             Die(direction);
-
+            experience.AddExperience(25);
         }
 
         blinkTimer = blinkDuration;
@@ -60,6 +64,8 @@ public class Health : MonoBehaviour
             ai.enabled = false; // Sluk AI’en
 
         transform.Find("Canvas").gameObject.SetActive(false);
+        
+       
 
 
       
