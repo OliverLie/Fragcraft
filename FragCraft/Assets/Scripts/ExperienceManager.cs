@@ -4,13 +4,16 @@ using UnityEngine.UI;
 
 public class ExperienceManager : MonoBehaviour
 {
-    [Header("Experience")]
+    [Header("Experience Settings")]
     [SerializeField] AnimationCurve experienceCurve;
     public int currentLevel = 0;
     public int totalExperience = 0;
+
     private int previousLevelsExperience = 0;
     private int nextLevelsExperience = 0;
-  
+
+    [Header("Level-Up Points")]
+    public int availablePoints = 0;
 
     [Header("UI")]
     [SerializeField] TextMeshProUGUI levelText;
@@ -19,6 +22,8 @@ public class ExperienceManager : MonoBehaviour
 
     void Start()
     {
+        previousLevelsExperience = (int)experienceCurve.Evaluate(currentLevel);
+        nextLevelsExperience = (int)experienceCurve.Evaluate(currentLevel + 1);
 
         UpdateLevelUI();
     }
@@ -26,6 +31,8 @@ public class ExperienceManager : MonoBehaviour
     public void AddExperience(int amount)
     {
         totalExperience += amount;
+        Debug.Log($"Gained {amount} XP (Total: {totalExperience})");
+
         CheckForLevelUp();
         UpdateLevelUI();
     }
@@ -38,13 +45,14 @@ public class ExperienceManager : MonoBehaviour
             previousLevelsExperience = (int)experienceCurve.Evaluate(currentLevel);
             nextLevelsExperience = (int)experienceCurve.Evaluate(currentLevel + 1);
 
-            Debug.Log($"Level up! Now level {currentLevel}");
+            availablePoints++;
+            Debug.Log($"Level up! Now level {currentLevel}. Upgrade points: {availablePoints}");
 
-            // Trigger WCSMenu level-up
+            // Åbn menu med CanvasGroup
             WCSMenu menu = FindFirstObjectByType<WCSMenu>();
             if (menu != null)
             {
-                menu.ShowLevelUpMenu();
+                menu.OpenClassMenu();
             }
         }
     }
@@ -52,9 +60,24 @@ public class ExperienceManager : MonoBehaviour
     private void UpdateLevelUI()
     {
         int start = totalExperience - previousLevelsExperience;
-        int end = Mathf.Max(1, nextLevelsExperience - previousLevelsExperience); // undgå div/0
-        levelText.text = currentLevel.ToString();
-        experienceText.text = $"{start} exp / {end} exp";
-        experienceFill.fillAmount = Mathf.Clamp01((float)start / (float)end);
+        int end = Mathf.Max(1, nextLevelsExperience - previousLevelsExperience);
+
+        if (levelText != null) levelText.text = $"{currentLevel}";
+        if (experienceText != null) experienceText.text = $"{start} / {end} XP";
+        if (experienceFill != null) experienceFill.fillAmount = Mathf.Clamp01((float)start / (float)end);
+    }
+
+    public bool SpendPoint()
+    {
+        if (availablePoints > 0)
+        {
+            availablePoints--;
+            return true;
+        }
+        else
+        {
+            Debug.Log("Ingen points tilgængelige til opgradering!");
+            return false;
+        }
     }
 }

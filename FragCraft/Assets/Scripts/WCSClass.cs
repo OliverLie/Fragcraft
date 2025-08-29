@@ -1,11 +1,15 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "WCS/Class")]
+[System.Serializable]
+public class WcsSpell
+{
+    public string spellName;
+    public int maxLevel = 5;
+}
+
+[CreateAssetMenu(fileName = "NewClass", menuName = "WCS/Class")]
 public class WCSClass : ScriptableObject
 {
     public string className;
-    public string description;
-    public Sprite classIcon;
-
-    public Spell[] spells; // 4 spells typisk
+    public Spell[] spells;
 }

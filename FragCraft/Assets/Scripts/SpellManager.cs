@@ -1,23 +1,70 @@
+using System;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class SpellManager : MonoBehaviour
 {
     public WCSClass playerClass;
     public int[] spellLevels;
+    public float Cooldown = 10f;
+    public float SpellTravelSpeed = 20f;
+    public Camera cam;
+    public float spawnDistance = 1f;
+    [SerializeField] Transform PlayerCast;
+    [SerializeField] GameObject FireBallVFX;
 
-    public void Start()
-    {
 
-    
-    if (playerClass != null && (spellLevels == null || spellLevels.Length != playerClass.spells.Length))
+    void Start()
+
     {
+        
+        
+        if (playerClass != null)
+        {
+            spellLevels = new int[playerClass.spells.Length];
+        }
+    }
+
+    void Update()
+    {
+    if (Input.GetKeyDown(KeyCode.U)) UseSpell(0);
+    if (Input.GetKeyDown(KeyCode.I)) UseSpell(1);
+    if (Input.GetKeyDown(KeyCode.O)) UseSpell(2);
+    if (Input.GetKeyDown(KeyCode.P)) UseSpell(3);
+    }
+
+    public void SelectClass(WCSClass newClass)
+    {
+        playerClass = newClass;
         spellLevels = new int[playerClass.spells.Length];
-        // Sæt alle til level 1 for test
-        for (int i = 0; i < spellLevels.Length; i++) spellLevels[i] = 1;
+        Debug.Log($"Class valgt: {playerClass.className}");
     }
-    
 
+    public void UpgradeSpell(int index)
+    {
+        if (playerClass == null)
+        {
+            Debug.LogWarning("Ingen class valgt!");
+            return;
+        }
+
+        if (index < 0 || index >= spellLevels.Length)
+        {
+            Debug.LogWarning("Spell index udenfor rækkevidde!");
+            return;
+        }
+
+        if (spellLevels[index] < playerClass.spells[index].maxLevel)
+        {
+            spellLevels[index]++;
+            Debug.Log($"Upgraderede {playerClass.spells[index].spellName} til level {spellLevels[index]}");
+        }
+        else
+        {
+            Debug.Log($"{playerClass.spells[index].spellName} er allerede max level!");
+        }
     }
+
     public void UseSpell(int index)
     {
         if (index < 0 || index >= playerClass.spells.Length) return;
@@ -27,72 +74,77 @@ public class SpellManager : MonoBehaviour
 
         if (level <= 0) return; // spell ikke unlocked
 
-        // Udfør spell effekt
         switch (spell.type)
         {
             case SpellType.VampiricAura:
-                ApplyVampiricAura(level);
+                //ApplyVampiricAura(level);
                 break;
             case SpellType.Levitation:
-                ApplyLevitation(level);
+                //ApplyLevitation(level);
                 break;
             case SpellType.UnholyAura:
-                ApplyUnholyAura(level);
+                //ApplyUnholyAura(level);
                 break;
             case SpellType.SuicideBomber:
-                ApplySuicideBomber(level);
+                //ApplySuicideBomber(level);
                 break;
             case SpellType.Fireball:
                 CastFireball(level);
                 break;
-            case SpellType.Heal:
-                CastHeal(level);
+            case SpellType.AirBender:
+                CastAirbender(level);
                 break;
-            case SpellType.Blink:
-                CastBlink(level);
+            case SpellType.Fly:
+                CastFly(level);
                 break;
         }
+        
     }
 
-    private void ApplyVampiricAura(int level)
+    private void CastFly(int level)
     {
-        Debug.Log($"Vampiric Aura aktiveret, level {level} (lifesteal)");
-        // Her kan du f.eks. give spilleren +X% lifesteal
+        throw new NotImplementedException();
     }
 
-    private void ApplyLevitation(int level)
+    private void CastAirbender(int level)
     {
-        Debug.Log($"Levitation aktiveret, level {level} (hop højere/fald langsomt)");
-        // Ændre player's jump force eller gravity scale
-    }
-
-    private void ApplyUnholyAura(int level)
-    {
-        Debug.Log($"Unholy Aura aktiveret, level {level} (bonus speed)");
-        // F.eks. øget movement speed
-    }
-
-    private void ApplySuicideBomber(int level)
-    {
-        Debug.Log($"Suicide Bomber aktiveret, level {level} (spræng skade)");
-        // Spawn explosion på spillerens position
+        throw new NotImplementedException();
     }
 
     private void CastFireball(int level)
     {
-        Debug.Log($"Cast Fireball, level {level}");
-        // Instantiate et prefab med projectile + damage
-    }
+        // Retning fra kamera
+        Vector3 shootDirection = Camera.main.transform.forward;
 
-    private void CastHeal(int level)
-    {
-        Debug.Log($"Cast Heal, level {level}");
-        // Tilføj liv til player
-    }
+        // Spawn position lidt foran kamera
+        Vector3 spawnPosition = Camera.main.transform.position + shootDirection * spawnDistance;
 
-    private void CastBlink(int level)
-    {
-        Debug.Log($"Cast Blink, level {level}");
-        // Teleport player en kort distance
+        // Rotation i retning af shootDirection
+        Quaternion spawnRotation = Quaternion.LookRotation(shootDirection);
+
+        // Instantiate projectile
+        GameObject projectile = Instantiate(FireBallVFX, spawnPosition, spawnRotation);
+
+        // Hent Rigidbody og giv hastighed
+        Rigidbody rb = projectile.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = shootDirection * SpellTravelSpeed;
+            rb.useGravity = false; // Valgfrit, hvis du ikke vil have gravity
+        }
     }
 }
+    
+
+
+
+    
+
+
+
+
+    
+
+
+    
+

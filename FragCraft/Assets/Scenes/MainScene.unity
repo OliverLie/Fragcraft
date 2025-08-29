@@ -4470,6 +4470,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   currentLevel: 0
   totalExperience: 0
+  availablePoints: 0
   levelText: {fileID: 1960508647}
   experienceText: {fileID: 887766124}
   experienceFill: {fileID: 438602785}
@@ -4812,11 +4813,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8949e70021e847544b16e566b23f275c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentClass: {fileID: 11400000, guid: 9b8756ed399fe59478448259b234c82c, type: 2}
-  spellLevels: 00000000000000000000000000000000
-  MenuPanelGroup: {fileID: 309321319}
-  ClassPanelGroup: {fileID: 1432786665}
-  BackgroundGroup: {fileID: 1340580764}
+  menuCanvasGroup: {fileID: 309321319}
+  ClassCanvasGroup: {fileID: 1432786665}
+  BackGroundFiller: {fileID: 1340580764}
   spellManager: {fileID: 362103226}
 --- !u!1001 &295277271
 PrefabInstance:
@@ -6180,6 +6179,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerClass: {fileID: 11400000, guid: 9b8756ed399fe59478448259b234c82c, type: 2}
   spellLevels: 
+  Cooldown: 10
+  SpellTravelSpeed: 15000
+  cam: {fileID: 330585545}
+  PlayerCast: {fileID: 748114416}
+  FireBallVFX: {fileID: 3773615562265031223, guid: 71cebe5ce832947479c55820859e9364, type: 3}
 --- !u!1001 &365865605
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11465,6 +11469,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4000010230679374, guid: fee6e1da33beae9409089ab8a832464f, type: 3}
   m_PrefabInstance: {fileID: 745456053}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &748114415
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 748114416}
+  m_Layer: 10
+  m_Name: Castpoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &748114416
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748114415}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.884, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 362103223}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &749247653
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29974,6 +30009,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 183996124195189847, guid: 6380c7809d0347f40bdb4aecbd6b7025, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1786523581}
+    - targetCorrespondingSourceObject: {fileID: 183996124195189847, guid: 6380c7809d0347f40bdb4aecbd6b7025, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 748114416}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8157803854993014045, guid: 6380c7809d0347f40bdb4aecbd6b7025, type: 3}
       insertIndex: -1

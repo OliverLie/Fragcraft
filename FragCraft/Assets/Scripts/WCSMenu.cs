@@ -2,122 +2,108 @@ using UnityEngine;
 
 public class WCSMenu : MonoBehaviour
 {
-    [Header("Class Info")]
-    public WCSClass currentClass;
-    public int[] spellLevels;
-
-    [Header("UI Panels (use CanvasGroup)")]
-    public CanvasGroup MenuPanelGroup;
-    public CanvasGroup ClassPanelGroup;
-    public CanvasGroup BackgroundGroup;
-    public SpellManager spellManager;
+    [Header("UI")]
+    [SerializeField] private CanvasGroup menuCanvasGroup;
+    [SerializeField] private CanvasGroup ClassCanvasGroup;
+    [SerializeField] private CanvasGroup BackGroundFiller;
+    [SerializeField] private SpellManager spellManager;
 
     private bool menuOpen = false;
-    private bool canUpgrade = false;
+    private bool ClassMenuOpen = false;
 
-    void Update()
+    private void Awake()
     {
-        SpellUse();
-        HandleUpgradeInput();
+        if (menuCanvasGroup != null)
+            CloseMenu();
+    }
 
-        // Manual open menu
+    private void Update()
+    {
         if (Input.GetKeyDown(KeyCode.M))
         {
-            SetCanvasGroup(MenuPanelGroup, true);
-            SetCanvasGroup(BackgroundGroup, true);
-            menuOpen = true;
-            canUpgrade = false; // her kun til browsing, ikke opgradering
+            OpenMenu();
+
         }
 
-        // Close menu
+        if (menuOpen || ClassMenuOpen)
+        {
+            // Tast 1 = første spell, tast 2 = anden spell, osv.
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+                TryUpgradeSpell(0);
+
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+                TryUpgradeSpell(1);
+
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+                TryUpgradeSpell(2);
+
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+                TryUpgradeSpell(3);
+        }
+
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
-            SetCanvasGroup(MenuPanelGroup, false);
-            SetCanvasGroup(BackgroundGroup, false);
             CloseMenu();
         }
     }
 
-    #region Class Handling
-
-    public void SelectClass(WCSClass newClass)
+    public void OpenMenu()
     {
-        currentClass = newClass;
-        spellLevels = new int[currentClass.spells.Length];
-        Debug.Log($"Selected class: {currentClass.className}");
+        if (menuCanvasGroup != null)
+        {
+            menuCanvasGroup.alpha = 1f;
+            menuCanvasGroup.interactable = true;
+            menuCanvasGroup.blocksRaycasts = true;
+            menuOpen = true;
+            BackGroundFiller.alpha = 1f;
+        }
     }
 
-    public void ShowLevelUpMenu()
+    public void OpenClassMenu()
     {
-        if (currentClass == null)
+        if (ClassCanvasGroup != null)
         {
-            Debug.LogWarning("No class selected!");
-            return;
+            ClassCanvasGroup.alpha = 1f;
+            ClassCanvasGroup.interactable = true;
+            ClassCanvasGroup.blocksRaycasts = true;
+            ClassMenuOpen = true;
+            BackGroundFiller.alpha = 1f;
+        }
+    }
+
+
+    public void CloseMenu()
+    {
+        if (menuCanvasGroup != null)
+        {
+            menuCanvasGroup.alpha = 0f;
+            menuCanvasGroup.interactable = false;
+            menuCanvasGroup.blocksRaycasts = false;
+            menuOpen = false;
+            BackGroundFiller.alpha = 0f;
+
         }
 
-        SetCanvasGroup(ClassPanelGroup, true);
-        SetCanvasGroup(BackgroundGroup, true);
-
-        menuOpen = true;
-        canUpgrade = true;
-
-        Debug.Log("Level up! Vælg en spell at opgradere (1-4).");
-    }
-
-    private void HandleUpgradeInput()
-    {
-        if (!menuOpen || !canUpgrade || currentClass == null) return;
-
-        if (Input.GetKeyDown(KeyCode.Alpha1)) { UpgradeSpell(0); }
-        else if (Input.GetKeyDown(KeyCode.Alpha2)) { UpgradeSpell(1); }
-        else if (Input.GetKeyDown(KeyCode.Alpha3)) { UpgradeSpell(2); }
-        else if (Input.GetKeyDown(KeyCode.Alpha4)) { UpgradeSpell(3); }
-    }
-
-    private void UpgradeSpell(int index)
-    {
-        if (index < 0 || index >= spellLevels.Length) return;
-
-        if (spellLevels[index] < currentClass.spells[index].maxLevel)
+        if (ClassCanvasGroup != null)
         {
-            spellLevels[index]++;
-            Debug.Log($"Upgraded {currentClass.spells[index].spellName} to level {spellLevels[index]}");
+            ClassCanvasGroup.alpha = 0f;
+            ClassCanvasGroup.interactable = false;
+            ClassCanvasGroup.blocksRaycasts = false;
+            ClassMenuOpen = false;
+        }
+    }
+
+    private void TryUpgradeSpell(int index)
+    {
+        ExperienceManager xp = FindFirstObjectByType<ExperienceManager>();
+        if (xp != null && xp.SpendPoint())
+        {
+            spellManager.UpgradeSpell(index);
+            CloseMenu();
         }
         else
         {
-            Debug.Log($"{currentClass.spells[index].spellName} is already max level!");
+            Debug.Log("Ingen upgrade points!");
         }
-
-        canUpgrade = false;
-        CloseMenu();
     }
-
-    private void CloseMenu()
-    {
-        SetCanvasGroup(ClassPanelGroup, false);
-        SetCanvasGroup(BackgroundGroup, false);
-
-        menuOpen = false;
-        canUpgrade = false;
-    }
-
-    private void SetCanvasGroup(CanvasGroup group, bool visible)
-    {
-        group.alpha = visible ? 1f : 0f;
-        group.interactable = visible;
-        group.blocksRaycasts = visible;
-    }
-
-    #endregion
-
-    public void SpellUse()
-    {
-
-    if (Input.GetKeyDown(KeyCode.U)) spellManager.UseSpell(0);
-    if (Input.GetKeyDown(KeyCode.I)) spellManager.UseSpell(1);
-    if (Input.GetKeyDown(KeyCode.O)) spellManager.UseSpell(2);
-    if (Input.GetKeyDown(KeyCode.P)) spellManager.UseSpell(3);
-    }
-
-    
 }

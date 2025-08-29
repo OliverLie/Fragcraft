@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "WCS/Spell")]
@@ -10,7 +11,9 @@ public class Spell : ScriptableObject
 
     // Effekter kan styres gennem events, enums, eller custom logik
     // For nu bare en "type" der kan bruges i manager
-    public SpellType type;  
+    public SpellType type;
+
+
 }
 
 public enum SpellType
