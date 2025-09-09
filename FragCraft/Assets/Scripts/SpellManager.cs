@@ -7,11 +7,17 @@ public class SpellManager : MonoBehaviour
     public WCSClass playerClass;
     public int[] spellLevels;
     public float Cooldown = 10f;
-    public float SpellTravelSpeed = 20f;
-    public Camera cam;
-    public float spawnDistance = 1f;
-    [SerializeField] Transform PlayerCast;
+    
     [SerializeField] GameObject FireBallVFX;
+    [SerializeField] GameObject AirbenderVFX;
+    public float spawnDistance = 1f;
+    public float SpellTravelSpeed = 20f;
+
+    public Camera cam;
+    
+    [SerializeField] Transform PlayerCast;
+    private GunShooting gunShooting;
+   
 
 
     void Start()
@@ -108,7 +114,25 @@ public class SpellManager : MonoBehaviour
 
     private void CastAirbender(int level)
     {
-        throw new NotImplementedException();
+    Vector3 shootDirection = Camera.main.transform.forward;
+
+    // Spawn foran kameraets position
+    Vector3 spawnPosition = Camera.main.transform.position + shootDirection * spawnDistance;
+    Quaternion spawnRotation = Quaternion.LookRotation(shootDirection);
+
+    GameObject projectile = Instantiate(AirbenderVFX, spawnPosition, spawnRotation);
+
+    // Rigidbody opsætning
+    Rigidbody rb = projectile.GetComponent<Rigidbody>();
+    if (rb != null)
+    {
+        rb.linearVelocity = shootDirection * SpellTravelSpeed; // brug linearVelocity nu
+        rb.useGravity = false;
+    }
+
+    Destroy(projectile, 3f);
+
+
     }
 
     private void CastFireball(int level)
@@ -132,6 +156,9 @@ public class SpellManager : MonoBehaviour
             rb.linearVelocity = shootDirection * SpellTravelSpeed;
             rb.useGravity = false; // Valgfrit, hvis du ikke vil have gravity
         }
+
+        Destroy(projectile, 3f);
+        
     }
 }
     

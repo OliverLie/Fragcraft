@@ -18,11 +18,17 @@ public class GunShooting : MonoBehaviour
     public GameObject ImpactVFX;
     public TextMeshProUGUI AmmoUI;
     public TextMeshProUGUI MagazineUI;
+    public AudioSource GunShootingSound;
+    public AudioSource GunReloadingSound;
+
+
 
     void Ready()
     {
         AmmoUI = GetComponent<TextMeshProUGUI>();
         MagazineUI = GetComponent<TextMeshProUGUI>();
+        GunShootingSound = GetComponent<AudioSource>();
+        GunReloadingSound = GetComponent<AudioSource>();
     }
 
 
@@ -38,7 +44,7 @@ public class GunShooting : MonoBehaviour
         AmmoUI.SetText("{0} / 30", AKMagSize);
     }
 
-    void Shoot()
+    public void Shoot()
     {
         if (AKMagSize > 0)
         {
@@ -68,7 +74,10 @@ public class GunShooting : MonoBehaviour
 
                 AKMagSize -= 1;
                 Debug.Log("Ammo left: " + AKMagSize);
+                GunShootingSound.Play();
+                
             }
+            
         }
     }
 
@@ -76,10 +85,11 @@ public class GunShooting : MonoBehaviour
     {
         if (Input.GetButtonDown("Reload") && AKMagazines > 0 && AKMagSize != 30)
         {
-            
+
             Debug.Log("Reloading");
             AKMagSize = 30;
             AKMagazines -= 1;
+            GunReloadingSound.Play();
         }
     }
 }

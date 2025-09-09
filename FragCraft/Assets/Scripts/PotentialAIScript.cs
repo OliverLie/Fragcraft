@@ -1,14 +1,18 @@
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
+using UnityEngine.Pool;
 
 public class PotentialAIScript : MonoBehaviour
 {
+    private IObjectPool<PotentialAIScript> enemyPool;
     public NavMeshAgent agent;
     public Transform player;
     public LayerMask whatIsGround, whatIsPlayer;
     public Transform weaponHandPosition;
     public Health EnemyAI;
+    private GameObject _player;
+    public Transform pelvisBone;
 
     Animator anim;
 
@@ -27,14 +31,22 @@ public class PotentialAIScript : MonoBehaviour
     public bool playerInSightRange, playerInAttackRange;
 
     Health health;
+    public Rigidbody[] rb;
 
+
+    public void SetPool(IObjectPool<PotentialAIScript> pool)
+    {
+        enemyPool = pool;
+    }
     private void Awake()
     {
         player = GameObject.Find("FirstPersonPlayer").transform;
         agent = GetComponent<NavMeshAgent>();
         health = GetComponent<Health>();
         anim = GetComponent<Animator>();
-        
+        _player = GameObject.FindGameObjectWithTag("Player");
+        rb = GetComponentsInChildren<Rigidbody>();
+
     }
 
     private void Update()
@@ -43,7 +55,8 @@ public class PotentialAIScript : MonoBehaviour
 
         if (health.currentHealth <= 0f)
         {
-            agent.isStopped = true;  // stop AI'en
+            agent.isStopped = true;
+            enemyPool.Release(this);  // stop AI'en
             return;                  // fjenden gør intet mere
         }
 
@@ -99,6 +112,11 @@ public class PotentialAIScript : MonoBehaviour
 
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
+
+
+            _player.GetComponent<PlayerHealth>().TakeDamage(10);
+
+
         }
     }
 
@@ -113,6 +131,17 @@ public class PotentialAIScript : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, attackRange);
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, sightRange);
+    }
+
+    public void AirbenderForce(Vector3 ThrustForce) //Fix script så det virker
+    {
+        foreach (Rigidbody item in rb)
+        {
+            item.AddForce(transform.up + ThrustForce);
+            Rigidbody targetRb = pelvisBone.GetComponent<Rigidbody>();
+            if (targetRb != null)
+            targetRb.AddForce(ThrustForce, ForceMode.VelocityChange);
+        }
     }
     
 
